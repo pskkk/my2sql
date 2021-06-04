@@ -3,8 +3,8 @@ package main
 import (
 	"sync"
 
-	my "my2sql/base"
 	"github.com/siddontang/go-mysql/replication"
+	my "my2sql/base"
 )
 
 func main() {

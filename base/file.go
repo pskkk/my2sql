@@ -1,18 +1,18 @@
 package base
 
 import (
-	"fmt"
-	"os"
-	"io"
 	"bytes"
-	"strings"
+	"fmt"
+	"io"
+	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/juju/errors"
-	toolkits "my2sql/toolkits"
 	"github.com/siddontang/go-log/log"
 	"github.com/siddontang/go-mysql/mysql"
 	"github.com/siddontang/go-mysql/replication"
+	toolkits "my2sql/toolkits"
 )
 
 
@@ -131,6 +131,7 @@ func (this BinFileParser) MyParseReader(cfg *ConfCmd, r io.Reader, binlog *strin
 
 
 		var h *replication.EventHeader
+
 		h, err = this.Parser.ParseHeader(headBuf)
 		if err != nil {
 			log.Error(fmt.Sprintf("fail to parse binlog event header of %s %v" , *binlog, err))

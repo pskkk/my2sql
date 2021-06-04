@@ -1,0 +1,35 @@
+# github.com/dropbox/godropbox v0.0.0-20200228041828-52ad444d3502
+## explicit
+github.com/dropbox/godropbox/encoding2
+github.com/dropbox/godropbox/errors
+# github.com/go-sql-driver/mysql v1.5.1-0.20200531100419-12508c83901b
+## explicit
+github.com/go-sql-driver/mysql
+# github.com/juju/errors v0.0.0-20200330140219-3fe23663418f
+## explicit
+github.com/juju/errors
+# github.com/juju/testing v0.0.0-20210324180055-18c50b0c2098
+## explicit
+# github.com/pingcap/errors v0.11.5-0.20190809092503-95897b64e011
+## explicit
+github.com/pingcap/errors
+# github.com/pkg/errors v0.9.1
+## explicit
+# github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b
+## explicit
+github.com/satori/go.uuid
+# github.com/shopspring/decimal v1.2.1-0.20200707070546-867ed12000cf
+## explicit
+github.com/shopspring/decimal
+# github.com/siddontang/go v0.0.0-20180604090527-bdc77568d726
+github.com/siddontang/go/hack
+# github.com/siddontang/go-log v0.0.0-20190221022429-1e957dd83bed
+## explicit
+github.com/siddontang/go-log/log
+github.com/siddontang/go-log/loggers
+# github.com/siddontang/go-mysql v1.0.0
+## explicit
+github.com/siddontang/go-mysql/client
+github.com/siddontang/go-mysql/mysql
+github.com/siddontang/go-mysql/packet
+github.com/siddontang/go-mysql/replication
