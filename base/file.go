@@ -15,7 +15,6 @@ import (
 	toolkits "my2sql/toolkits"
 )
 
-
 var (
 	fileBinEventHandlingIndex uint64 = 0
 	fileTrxIndex              uint64 = 0
@@ -36,6 +35,7 @@ func (this BinFileParser) MyParseAllBinlogFiles(cfg *ConfCmd) {
 
 	for {
 		if cfg.IfSetStopFilePos {
+			// 比较 binlog 先后顺序，若 小于 1 则说明有问题，break
 			if cfg.StopFilePos.Compare(mysql.Position{Name: filepath.Base(binlog), Pos: 4}) < 1 {
 				break
 			}
@@ -71,10 +71,10 @@ func (this BinFileParser) MyParseAllBinlogFiles(cfg *ConfCmd) {
 	log.Info("finish parsing binlog from local files")
 
 }
-
+// MyParseOneBinlogFile 读取文件开头的4字节，以此判断文件是否为合法的 binlog，是合法的binlog 则 返回 this.MyParseReader(cfg, f, &binlog)
 func (this BinFileParser) MyParseOneBinlogFile(cfg *ConfCmd, name string) (int, error) {
 	// process: 0, continue: 1, break: 2
-	f, err := os.Open(name)
+	f, err := os.Open(name) // 打开 binlog
 	if f != nil {
 		defer f.Close()
 	}
@@ -85,25 +85,26 @@ func (this BinFileParser) MyParseOneBinlogFile(cfg *ConfCmd, name string) (int, 
 
 	fileTypeBytes := int64(4)
 
-	b := make([]byte, fileTypeBytes)
-	if _, err = f.Read(b); err != nil {
+	b := make([]byte, fileTypeBytes) // 4 缓冲 []byte
+
+	if _, err = f.Read(b); err != nil { // 读取开头 4字节 binlogHeader
 		log.Error(fmt.Sprintf("fail to read %s %v", name, err))
 		return C_reBreak, errors.Trace(err)
-	} else if !bytes.Equal(b, replication.BinLogFileHeader) {
+	} else if !bytes.Equal(b, replication.BinLogFileHeader) { // 判断读取到的 4字节 内容，是否为合法的 binlog Header
 		log.Error(fmt.Sprintf("%s is not a valid binlog file, head 4 bytes must fe'bin' ", name))
 		return C_reBreak, errors.Trace(err)
 	}
 
 	// must not seek to other position, otherwise the program may panic because formatevent, table map event is skipped
-	if _, err = f.Seek(fileTypeBytes, os.SEEK_SET); err != nil {
+	if _, err = f.Seek(fileTypeBytes, os.SEEK_SET); err != nil { // 已经读了 4字节，所以 偏移 4字节
 		log.Error(fmt.Sprintf("error seek %s to %d", name, fileTypeBytes))
 		return C_reBreak, errors.Trace(err)
 	}
 	var binlog string = filepath.Base(name)
-	return this.MyParseReader(cfg, f, &binlog)
+	return this.MyParseReader(cfg, f, &binlog) // 传入 命令行参数struct，偏移4字节的 文件句柄 *os.File ， 不包含路径的binlog名称
 }
 
-
+// MyParseReader
 func (this BinFileParser) MyParseReader(cfg *ConfCmd, r io.Reader, binlog *string) (int, error) {
 	// process: 0, continue: 1, break: 2, EOF: 3
 	var (
@@ -120,9 +121,9 @@ func (this BinFileParser) MyParseReader(cfg *ConfCmd, r io.Reader, binlog *strin
 	)
 
 	for {
-		headBuf := make([]byte, replication.EventHeaderSize)
+		headBuf := make([]byte, replication.EventHeaderSize) // EventHeaderSize = 19 , 长度 19 的 []byte
 
-		if _, err = io.ReadFull(r, headBuf); err == io.EOF {
+		if _, err = io.ReadFull(r, headBuf); err == io.EOF { // 每次，从文件 r 读取 19 字节(Event 头信息);如果是 io.EOF 则说明文件读取完毕，跳出循环
 			return C_reFileEnd, nil
 		} else if err != nil {
 			log.Error(fmt.Sprintf("fail to read binlog event header of %s %v", *binlog, err))
@@ -131,7 +132,7 @@ func (this BinFileParser) MyParseReader(cfg *ConfCmd, r io.Reader, binlog *strin
 
 
 		var h *replication.EventHeader
-
+		// 解析 Event Header 信息，获取到一个 就偏移 一部分，最终获取到完整的 EventHeader
 		h, err = this.Parser.ParseHeader(headBuf)
 		if err != nil {
 			log.Error(fmt.Sprintf("fail to parse binlog event header of %s %v" , *binlog, err))
@@ -146,7 +147,7 @@ func (this BinFileParser) MyParseReader(cfg *ConfCmd, r io.Reader, binlog *strin
 		}
 
 		var buf bytes.Buffer
-		if n, err = io.CopyN(&buf, r, int64(h.EventSize)-int64(replication.EventHeaderSize)); err != nil {
+		if n, err = io.CopyN(&buf, r, int64(h.EventSize)-int64(replication.EventHeaderSize)); err != nil { // 不读取EventHeader信息，其余的存入 buf 中
 			err = errors.Errorf("get event body err %v, need %d - %d, but got %d", err, h.EventSize, replication.EventHeaderSize, n)
 			log.Error("%v", err)
 			return C_reBreak, err
@@ -155,7 +156,7 @@ func (this BinFileParser) MyParseReader(cfg *ConfCmd, r io.Reader, binlog *strin
 
 		//h.Dump(os.Stdout)
 
-		data := buf.Bytes()
+		data := buf.Bytes() // buf 转为 []byte
 		var rawData []byte
 		rawData = append(rawData, headBuf...)
 		rawData = append(rawData, data...)

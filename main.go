@@ -6,7 +6,7 @@ import (
 	"github.com/siddontang/go-mysql/replication"
 	my "my2sql/base"
 )
-
+// ./main  -user root -password root -host 192.168.109.129   -port 3306  -mode file -local-binlog-file ./mysqlbin.000011 -work-type rollback  -start-file mysqlbin.000011 -output-dir ./tmpdir
 func main() {
 	my.GConfCmd.IfSetStopParsPoint = false
 	my.GConfCmd.ParseCmdOptions()
@@ -35,7 +35,7 @@ func main() {
 		myParser.Parser.SetParseTime(false) 
 		// sqlbuilder not support decimal type 
 		myParser.Parser.SetUseDecimal(false) 
-		myParser.MyParseAllBinlogFiles(my.GConfCmd)
+		myParser.MyParseAllBinlogFiles(my.GConfCmd) // 开始解析
 	}
 	wgGenSql.Wait()
 	close(my.GConfCmd.SqlChan)

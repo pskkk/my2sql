@@ -1,14 +1,14 @@
 package base
 
 import (
-	"sync"
 	"path/filepath"
+	"sync"
 
-	"my2sql/dsql"
-	toolkits "my2sql/toolkits"
 	"github.com/siddontang/go-log/log"
 	"github.com/siddontang/go-mysql/mysql"
 	"github.com/siddontang/go-mysql/replication"
+	"my2sql/dsql"
+	toolkits "my2sql/toolkits"
 )
 
 type BinEventHandlingIndx struct {
@@ -222,7 +222,7 @@ func CheckBinHeaderCondition(cfg *ConfCmd, header *replication.EventHeader, curr
 
 	return C_reProcess
 }
-
+// GetFirstBinlogPosToParse 获取参数中给定的binlog名称 与 开始的 position
 func GetFirstBinlogPosToParse(cfg *ConfCmd) (string, int64) {
 	var binlog string
 	var pos int64

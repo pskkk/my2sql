@@ -70,6 +70,7 @@ func CheckIsDir(fd string) (bool, string) {
 	}
 }
 
+// GetBinlogBasenameAndIndex 根据 binlog 名称，解析出 binlog 的 basename 与 index
 func GetBinlogBasenameAndIndex(binlog string) (string, int) {
 	binlogFile := filepath.Base(binlog)
 	arr := strings.Split(binlogFile, ".")

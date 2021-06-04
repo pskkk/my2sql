@@ -10,6 +10,7 @@ type Position struct {
 	Pos  uint32
 }
 
+// Compare 比较两个binlog 先后顺序，若只有一个binlog 则比较postion先后顺序，是否正确
 func (p Position) Compare(o Position) int {
 	// First compare binlog name
 	if p.Name > o.Name {
