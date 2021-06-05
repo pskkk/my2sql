@@ -33,7 +33,7 @@ func (this BinFileParser) MyParseAllBinlogFiles(cfg *ConfCmd) {
 	binBaseName, binBaseIndx := GetBinlogBasenameAndIndex(binlog)
 	log.Info(fmt.Sprintf("start to parse %s %d\n", binlog, binpos))
 
-	for {
+	for { // 为什么要循环？？？
 		if cfg.IfSetStopFilePos {
 			// 比较 binlog 先后顺序，若 小于 1 则说明有问题，break
 			if cfg.StopFilePos.Compare(mysql.Position{Name: filepath.Base(binlog), Pos: 4}) < 1 {
@@ -69,7 +69,6 @@ func (this BinFileParser) MyParseAllBinlogFiles(cfg *ConfCmd) {
 
 	}
 	log.Info("finish parsing binlog from local files")
-
 }
 // MyParseOneBinlogFile 读取文件开头的4字节，以此判断文件是否为合法的 binlog，是合法的binlog 则 返回 this.MyParseReader(cfg, f, &binlog)
 func (this BinFileParser) MyParseOneBinlogFile(cfg *ConfCmd, name string) (int, error) {
